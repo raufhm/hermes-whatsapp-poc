@@ -2,7 +2,7 @@
 
 A lightweight, Docker-native setup for running the [Hermes Agent](https://hermes-agent.nousresearch.com/) with WhatsApp integration using OpenRouter LLMs.
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Initial Setup
 Initialize your environment file (defaults to `dev`):
@@ -24,7 +24,7 @@ Launch the agent in the background:
 make start ENV=dev
 ```
 
-## 🌍 Environment Support
+## Environment Support
 
 You can manage multiple isolated environments (e.g., `dev`, `stg`, `prd`) by appending `ENV=<name>` to any `make` command.
 
@@ -37,7 +37,7 @@ You can manage multiple isolated environments (e.g., `dev`, `stg`, `prd`) by app
 - `make logs ENV=stg`: View logs for the staging agent.
 - `make status ENV=dev`: Check status of the development agent.
 
-## 🛠️ Management Commands
+## Management Commands
 
 Use the provided `Makefile` for easy management:
 
@@ -49,7 +49,7 @@ Use the provided `Makefile` for easy management:
 | `make restart`| Restart the service after config changes |
 | `make clean` | **Reset everything**: Deletes ALL environment data and stops containers |
 
-## ⚙️ Configuration
+## Configuration
 
 ### Environment (`.env`)
 | Variable | Description | Default |
@@ -61,13 +61,29 @@ Use the provided `Makefile` for easy management:
 ### Customizing Behavior (`config.yaml`)
 Edit `config.yaml` to change the agent's personality, reasoning levels, or to add **MCP Tools**. Examples for adding Google Maps, GitHub, or SQLite tools are included as comments at the bottom of the file.
 
-## 📂 Project Structure
-- `config.yaml`: Core agent behavior and MCP tool settings.
-- `Makefile`: Standard interface for all operations.
-- `scripts/`: Internal automation for Docker operations.
-- `data/`: (**Ignored by Git**) Stores your encrypted WhatsApp session and logs.
+## EC2 WhatsApp Integration
 
-## 🛡️ Security
+This project includes an optional integration to manage WhatsApp bots on remote EC2 instances. See the [EC2 Integration Guide](README-EC2.md) for setup instructions.
+
+## Project Structure
+
+- `CONSTITUTION.md`: Project governance and development standards
+- `skills/`: Skill specifications defining agent capabilities
+- `mcp-servers/`: MCP server implementations
+- `config-*.yaml`: Environment-specific configurations
+- `Makefile`: Standard interface for all operations
+- `scripts/`: Internal automation for Docker operations
+- `data/`: (**Ignored by Git**) Stores your encrypted WhatsApp session and logs
+
+## Security
+
 - Your `.env` and `data/` folder contain sensitive session keys; they are automatically ignored by git.
 - WhatsApp sessions are stored locally in the `data/` volume.
 - Use `WHATSAPP_ALLOWED_USERS` in `.env` to restrict who can talk to your bot.
+- SSH keys for EC2 integration are stored in `keys/` (gitignored) and mounted read-only to containers.
+
+## Documentation
+
+- **[CONSTITUTION.md](CONSTITUTION.md)**: Development standards and project governance
+- **[README-EC2.md](README-EC2.md)**: EC2 WhatsApp integration guide
+- **[skills/ec2-whatsapp/SKILL.md](skills/ec2-whatsapp/SKILL.md)**: EC2 WhatsApp capability specification

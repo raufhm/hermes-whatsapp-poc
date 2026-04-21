@@ -31,31 +31,37 @@ security:
 logging:
   level: info  # debug, info, warn, error
 
+# Skills Configuration
+# Skills are loaded from ~/.hermes/skills/ and external directories
+skills:
+  # External skill directories to scan (in addition to ~/.hermes/skills/)
+  external_dirs:
+    - /workspace/skills
+
 # MCP Servers (Model Context Protocol)
-# Uncomment and configure these to add new tools to Hermes.
 # Once added, enable them for WhatsApp with: 
 #   docker compose run --rm hermes tools enable whatsapp <name>:*
 #
-# mcp_servers:
-#   # Example 1: HTTP/SSE server (e.g., a shared toolset)
-#   # maps:
-#   #   url: https://mcp-server.example.com/sse
-#   #   enabled: true
-#
-#   # Example 2: Local stdio server (e.g., the official SQLite server)
-#   # sqlite:
-#   #   command: npx
-#   #   args: 
-#   #     - "-y"
-#   #     - "@modelcontextprotocol/server-sqlite"
-#   #     - "--db"
-#   #     - "/opt/data/state.db"
-#   #   enabled: true
-#
-#   # Example 3: Server requiring an API key (from .env)
-#   # github:
-#   #   command: npx
-#   #   args: ["-y", "@modelcontextprotocol/server-github"]
-#   #   env:
-#   #     GITHUB_PERSONAL_ACCESS_TOKEN: "${MCP_GITHUB_API_KEY}"
-#   #   enabled: true
+mcp_servers:
+  # SSH EC2 server - connects to your EC2 instance via SSH
+  ssh-ec2:
+    command: npx
+    args:
+      - "-y"
+      - "ssh-mcp"
+      - "--"
+      - "--host=${EC2_HOST}"
+      - "--user=${EC2_USER}"
+      - "--key=/opt/keys/${EC2_KEY_FILE}"
+    enabled: true
+
+  # EC2 WhatsApp MCP Server - custom server for managing WhatsApp bots on EC2
+  ec2-whatsapp:
+    command: docker
+    args:
+      - "exec"
+      - "-i"
+      - "ec2-whatsapp-mcp-${ENV:-dev}"
+      - "node"
+      - "index.js"
+    enabled: true

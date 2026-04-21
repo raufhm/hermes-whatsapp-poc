@@ -1,59 +1,35 @@
 ```
-# Runtime data
-data/
+# Dependencies
+node_modules/
 
-.dockerenv
-.dockerinit
-*.dockerignore
-
-# Environment variables
+# Environment
 .env
 .env.local
 .env.*
 
-# Logs
+# Logs and temp files
 *.log
-
-# Temporary files
 *.tmp
-*.temp
-*~
-.DS_Store
-Thumbs.db
 
-# Dependencies (if any)
-node_modules/
-venv/
-.venv/
-__pycache__/
-*.egg-info/
-
-# Build artifacts (if any)
-build/
-dist/
-target/
-coverage/
-htmlcov/
-*.pyc
-*.class
-*.o
-*.obj
-*.exe
-*.dll
-*.so
-*.a
-*.out
-
-# IDE specific
+# Editors
 .vscode/
 .idea/
+
+# Build artifacts
+dist/
+build/
+target/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.py.class
+*.py.backup
+*.py~
 *.swp
 *.swo
-
-# Testing
-.pytest_cache/
-.mypy_cache/
-.coverage
 
 # Compressed files
 *.zip
@@ -78,4 +54,18 @@ htmlcov/
 *.tar.bz2
 *.tar.xz
 *.tar.zst
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Coverage reports
+coverage/
+htmlcov/
+.coverage
+
+# Cache directories
+.mypy_cache/
+.pytest_cache/
+.gradle/
 ```
