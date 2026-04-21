@@ -1,5 +1,7 @@
 ```
-# Docker related
+# Runtime data
+data/
+
 .dockerenv
 .dockerinit
 *.dockerignore
