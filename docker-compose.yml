@@ -28,6 +28,12 @@ services:
       - NPM_CONFIG_FETCH_RETRY_MAXTIMEOUT=30000
       - NPM_CONFIG_FETCH_RETRIES=5
       - NODE_TLS_REJECT_UNAUTHORIZED=0
+      
+      # EC2 SSH Configuration
+      - EC2_HOST=${EC2_HOST}
+      - EC2_USER=${EC2_USER}
+      - EC2_KEY_FILE=${EC2_KEY_FILE:-ec2-whatsapp.pem}
+      - EC2_KEY_PATH=/opt/keys/${EC2_KEY_FILE:-ec2-whatsapp.pem}
     
     volumes:
       # Persist Hermes configuration and session data
@@ -35,6 +41,9 @@ services:
       
       # Optional: Mount custom config file
       - ./${HERMES_CONFIG_FILE:-config.yaml}:/opt/data/config.yaml:ro
+      
+      # Mount EC2 PEM key file (read-only)
+      - ${EC2_KEY_PATH:-./keys/ec2-whatsapp.pem}:/opt/keys/${EC2_KEY_FILE:-ec2-whatsapp.pem}:ro
     
     networks:
       - hermes-network
@@ -48,6 +57,30 @@ services:
       start_period: 40s
     
     # Logging configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    depends_on:
+      - ec2-whatsapp-mcp
+
+  ec2-whatsapp-mcp:
+    build:
+      context: ./mcp-servers/ec2-whatsapp
+      dockerfile: Dockerfile
+    container_name: ec2-whatsapp-mcp-${ENV:-dev}
+    restart: unless-stopped
+    environment:
+      - EC2_HOST=${EC2_HOST}
+      - EC2_USER=${EC2_USER}
+      - EC2_KEY_FILE=/opt/keys/${EC2_KEY_FILE:-ec2-whatsapp.pem}
+    volumes:
+      # Mount EC2 PEM key file (read-only)
+      - ${EC2_KEY_PATH:-./keys/ec2-whatsapp.pem}:/opt/keys/${EC2_KEY_FILE:-ec2-whatsapp.pem}:ro
+    networks:
+      - hermes-network
     logging:
       driver: "json-file"
       options:
