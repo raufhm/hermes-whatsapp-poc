@@ -1,6 +1,6 @@
 # EC2 WhatsApp Skill Setup Guide
 
-This guide walks you through setting up the `ec2-whatsapp` skill in Hermes via SSH.
+This guide walks you through setting up EC2 WhatsApp bot management in Hermes via SSH using the `ssh-ec2` tool.
 
 ## Prerequisites
 
@@ -62,21 +62,18 @@ Verify the services are running:
 docker compose ps
 ```
 
-## Step 4: Enable the Skill
+## Step 4: Use SSH-EC2 Tool
 
-Enable the ec2-whatsapp skill for your WhatsApp agent:
+The `ssh-ec2` tool is built into Hermes and ready to use. No additional skill enablement required.
 
+Test connectivity:
 ```bash
-docker compose run --rm hermes tools enable whatsapp ec2-whatsapp:*
+docker compose run --rm hermes ssh-ec2 "cd /home/ec2-user/scripts && ./view.sh"
 ```
 
-Or use the slash command in chat:
+Or use directly in chat with Hermes - the agent will automatically use SSH commands when you ask about WhatsApp bots.
 
-```
-/ec2-whatsapp
-```
-
-## Step 5: Test the Skill
+## Step 5: Test with SSH-EC2
 
 ### Check Running Bots
 
@@ -103,7 +100,7 @@ Update the WhatsApp bot for mobile 6587654321 with email bot@example.com in stag
 
 The skill will:
 1. Ask you to confirm the parameters (env, mobile, email)
-2. Execute `update.sh` on EC2 via SSH
+2. Execute `update.sh` on EC2 via SSH using the ssh-ec2 tool
 3. Verify the bot started successfully
 
 ## Usage Examples
@@ -176,6 +173,6 @@ If Hermes prompts for environment variables every time:
 
 ## Next Steps
 
-- Review the main [SKILL.md](../SKILL.md) for detailed procedures
+- Review the main [SKILL.md](../SKILL.md) for detailed procedures (reference only, use ssh-ec2 directly)
 - Check [references/scripts.md](./references/scripts.md) for script documentation
-- Monitor bot health regularly using the `view.sh` command
+- Monitor bot health regularly using the `view.sh` command via ssh-ec2 tool
