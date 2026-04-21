@@ -1,58 +1,57 @@
+```
+# Docker related
+.dockerenv
+.dockerinit
+*.dockerignore
+
 # Environment variables
 .env
 .env.local
-*.env.*
-
-# Data directory
-data/
-
-# Dependencies
-...
-
-node_modules/
-venv/
-.venv/
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-
-# Build outputs
-dist/
-build/
-target/
+.env.*
 
 # Logs
 *.log
 
 # Temporary files
 *.tmp
-*.swp
-*.swo
-
-# OS generated files
+*.temp
+*~
 .DS_Store
 Thumbs.db
+
+# Dependencies (if any)
+node_modules/
+venv/
+.venv/
+__pycache__/
+*.egg-info/
+
+# Build artifacts (if any)
+build/
+dist/
+target/
+coverage/
+htmlcov/
+*.pyc
+*.class
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.a
+*.out
 
 # IDE specific
 .vscode/
 .idea/
-*.iml
-*.ipr
-*.iws
+*.swp
+*.swo
 
-# Coverage reports
-coverage/
-htmlcov/
+# Testing
+.pytest_cache/
+.mypy_cache/
 .coverage
-
-# Python cache
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-*.so
 
 # Compressed files
 *.zip
