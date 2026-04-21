@@ -28,7 +28,7 @@ required_environment_variables:
 
 ## When to Use
 
-Use this skill when you need to:
+Use the `ssh-ec2` tool when you need to:
 - Check which WhatsApp bot processes are running on the remote EC2 instance
 - Deploy or update a WhatsApp bot instance for a specific phone number
 - Restart a bot that has stopped or is malfunctioning
@@ -41,7 +41,9 @@ Do NOT use this skill for:
 
 ## Overview
 
-WhatsApp bot instances run on a remote EC2 instance under `/home/ec2-user/scripts/`. This skill provides safe, scripted access to manage these bots through predefined shell scripts executed via SSH terminal commands.
+WhatsApp bot instances run on a remote EC2 instance under `/home/ec2-user/scripts/`. This documentation provides reference for managing these bots through predefined shell scripts executed via SSH using the built-in `ssh-ec2` tool.
+
+**Note:** The `ec2-whatsapp` skill definition is kept for reference only. Use the `ssh-ec2` tool directly for all operations.
 
 ## Prerequisites
 
@@ -56,20 +58,20 @@ WhatsApp bot instances run on a remote EC2 instance under `/home/ec2-user/script
 
 ### Step 1: Check Current State
 
-Before making any changes, always check what's currently running:
+Before making any changes, always check what's currently running using ssh-ec2:
 
 ```bash
-ssh -i $EC2_KEY_PATH $EC2_USER@$EC2_HOST "cd /home/ec2-user/scripts && ./view.sh"
+docker compose run --rm hermes ssh-ec2 "cd /home/ec2-user/scripts && ./view.sh"
 ```
 
 Filter by environment:
 
 ```bash
 # Production only
-ssh -i $EC2_KEY_PATH $EC2_USER@$EC2_HOST "cd /home/ec2-user/scripts && ./view.sh prd"
+docker compose run --rm hermes ssh-ec2 "cd /home/ec2-user/scripts && ./view.sh prd"
 
 # Staging only
-ssh -i $EC2_KEY_PATH $EC2_USER@$EC2_HOST "cd /home/ec2-user/scripts && ./view.sh stg"
+docker compose run --rm hermes ssh-ec2 "cd /home/ec2-user/scripts && ./view.sh stg"
 ```
 
 Output shows:
@@ -87,17 +89,17 @@ Always confirm these values with the user before proceeding.
 
 ### Step 3: Update/Restart the Bot
 
-Deploy the updated bot using the wrapper script:
+Deploy the updated bot using the wrapper script via ssh-ec2:
 
 ```bash
-ssh -i $EC2_KEY_PATH $EC2_USER@$EC2_HOST "cd /home/ec2-user/scripts && \
+docker compose run --rm hermes ssh-ec2 "cd /home/ec2-user/scripts && \
   ./update.sh -env=<stg|prd> -mobile=<country-code+number> -email=<bot-email>"
 ```
 
 Example:
 
 ```bash
-ssh -i $EC2_KEY_PATH $EC2_USER@$EC2_HOST "cd /home/ec2-user/scripts && \
+docker compose run --rm hermes ssh-ec2 "cd /home/ec2-user/scripts && \
   ./update.sh -env=stg -mobile=6587654321 -email=bot@example.com"
 ```
 
@@ -111,7 +113,7 @@ Required flags:
 After the update completes, verify the new process is running:
 
 ```bash
-ssh -i $EC2_KEY_PATH $EC2_USER@$EC2_HOST "cd /home/ec2-user/scripts && ./view.sh"
+docker compose run --rm hermes ssh-ec2 "cd /home/ec2-user/scripts && ./view.sh"
 ```
 
 Confirm the new process appears in the output with the correct mobile number and environment.
@@ -125,9 +127,9 @@ Confirm the new process appears in the output with the correct mobile number and
 
 ## Pitfalls
 
+- **Use ssh-ec2 tool** — The built-in `ssh-ec2` tool handles SSH authentication automatically using environment variables
 - **Never call `setup.sh` or `start.sh` directly** — always use `update.sh` which handles both in the correct sequence
 - **Mobile number format** — Do not include the `+` prefix (use `6587654321`, not `+6587654321`)
-- **SSH key permissions** — Ensure the PEM file has restricted permissions (chmod 600)
 - **Network connectivity** — Verify SSH access to EC2 before attempting operations
 - **Process conflicts** — `update.sh` removes old scripts before deploying new ones; don't interrupt mid-execution
 

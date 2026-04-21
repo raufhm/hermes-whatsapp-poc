@@ -54,14 +54,3 @@ mcp_servers:
       - "--user=${EC2_USER}"
       - "--key=/opt/keys/${EC2_KEY_FILE}"
     enabled: true
-
-  # EC2 WhatsApp MCP Server - custom server for managing WhatsApp bots on EC2
-  ec2-whatsapp:
-    command: docker
-    args:
-      - "exec"
-      - "-i"
-      - "ec2-whatsapp-mcp-${ENV:-dev}"
-      - "node"
-      - "index.js"
-    enabled: true

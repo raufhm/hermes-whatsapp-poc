@@ -27,10 +27,13 @@ docker compose logs -f hermes
 ```
 *Note: Press [Enter] once when prompted to "Update allowed users".*
 
-### 4. Enable EC2 WhatsApp Skill
-Enable the skill for managing WhatsApp bots on EC2:
+### 4. SSH-EC2 Tool Ready
+
+The `ssh-ec2` tool is built into Hermes and ready to use for managing WhatsApp bots on EC2. No additional skill enablement required.
+
+Test connectivity:
 ```bash
-docker compose run --rm hermes tools enable whatsapp ec2-whatsapp:*
+docker compose run --rm hermes ssh-ec2 "cd /home/ec2-user/scripts && ./view.sh"
 ```
 
 ## Environment Support
@@ -73,7 +76,7 @@ Edit `config.yaml` to change the agent's personality, reasoning levels, or to ad
 
 ## EC2 WhatsApp Integration
 
-This project includes integration to manage WhatsApp bots on remote EC2 instances via SSH. The agent uses the `ec2-whatsapp` skill to execute remote scripts securely. See the [EC2 Integration Guide](README-EC2.md) for setup instructions.
+This project includes integration to manage WhatsApp bots on remote EC2 instances via SSH using the built-in `ssh-ec2` tool. The agent executes remote scripts securely through SSH terminal commands. See the [EC2 Integration Guide](README-EC2.md) for setup instructions.
 
 ## Project Structure
 
@@ -94,5 +97,5 @@ This project includes integration to manage WhatsApp bots on remote EC2 instance
 ## Documentation
 
 - **[CONSTITUTION.md](CONSTITUTION.md)**: Development standards and project governance
-- **[README-EC2.md](README-EC2.md)**: EC2 WhatsApp integration guide via SSH
-- **[skills/ec2-whatsapp/SKILL.md](skills/ec2-whatsapp/SKILL.md)**: EC2 WhatsApp capability specification
+- **[README-EC2.md](README-EC2.md)**: EC2 WhatsApp integration guide via SSH using ssh-ec2 tool
+- **[skills/ec2-whatsapp/SKILL.md](skills/ec2-whatsapp/SKILL.md)**: EC2 WhatsApp capability specification (reference only, use ssh-ec2 directly)

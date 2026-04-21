@@ -1,15 +1,15 @@
 # EC2 WhatsApp Integration Guide
 
-This guide details the setup and usage of the EC2 WhatsApp Bot Management integration for the Hermes Agent via SSH.
+This guide details the setup and usage of EC2 WhatsApp Bot Management integration for the Hermes Agent via SSH using the `ssh-ec2` skill.
 
 ## Overview
 
-This integration enables the Hermes Agent to manage WhatsApp bot instances running on a remote EC2 server via SSH using the `ec2-whatsapp` skill. The agent executes remote scripts securely through SSH terminal commands.
+This integration enables the Hermes Agent to manage WhatsApp bot instances running on a remote EC2 server via SSH. The agent executes remote scripts securely through SSH terminal commands using the built-in `ssh-ec2` tool.
 
 ## Architecture Components
 
-1. **Hermes Core**: Main AI agent that receives user requests and uses the ec2-whatsapp skill
-2. **SSH Terminal Tool**: Built-in Hermes tool for executing SSH commands
+1. **Hermes Core**: Main AI agent that receives user requests and uses the ssh-ec2 tool
+2. **SSH Terminal Tool**: Built-in Hermes tool (`ssh-ec2`) for executing SSH commands
 3. **Remote EC2 Instance**: Hosts the WhatsApp bot scripts (`view.sh`, `update.sh`)
 
 ## Prerequisites
@@ -71,18 +71,16 @@ Expected output should include `view.sh` and `update.sh` with execute permission
 docker compose up -d
 ```
 
-### Step 5: Enable Skills
+### Step 5: Use SSH-EC2 Tool
 
-Enable the EC2 tools for your WhatsApp persona:
+The `ssh-ec2` tool is built into Hermes and ready to use. No additional skill enablement required.
 
+Test SSH connectivity manually:
 ```bash
-docker compose run --rm hermes tools enable whatsapp ec2-whatsapp:*
+docker compose run --rm hermes ssh-ec2 "ls -la /home/ec2-user/scripts/"
 ```
 
-Verify enabled tools:
-```bash
-docker compose run --rm hermes tools list whatsapp
-```
+Expected output should include `view.sh` and `update.sh` with execute permissions.
 
 ## Usage Examples
 
@@ -109,12 +107,17 @@ The agent will:
 
 ## Available Commands
 
-The ec2-whatsapp skill provides these capabilities via SSH:
+Use the `ssh-ec2` tool to execute remote scripts:
 
 | Command | Description | Required Arguments |
 |------|-------------|-------------------|
 | `view.sh [env]` | Lists running WhatsApp processes | None (optional: env) |
 | `update.sh` | Deploys and restarts a bot | -env, -mobile, -email |
+
+Example usage:
+```bash
+docker compose run --rm hermes ssh-ec2 "cd /home/ec2-user/scripts && ./view.sh prd"
+```
 
 ## Troubleshooting
 
