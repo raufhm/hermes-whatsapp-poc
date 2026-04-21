@@ -1,16 +1,16 @@
 # EC2 WhatsApp Integration Guide
 
-This guide details the setup and usage of the EC2 WhatsApp Bot Management integration for the Hermes Agent.
+This guide details the setup and usage of the EC2 WhatsApp Bot Management integration for the Hermes Agent via SSH.
 
 ## Overview
 
-This integration enables the Hermes Agent to manage WhatsApp bot instances running on a remote EC2 server via SSH. It uses a dedicated MCP (Model Context Protocol) server to execute remote scripts securely.
+This integration enables the Hermes Agent to manage WhatsApp bot instances running on a remote EC2 server via SSH using the `ec2-whatsapp` skill. The agent executes remote scripts securely through SSH terminal commands.
 
 ## Architecture Components
 
-1. **Hermes Core**: Main AI agent that receives user requests.
-2. **EC2 MCP Server**: Intermediate service that handles SSH connections and script execution.
-3. **Remote EC2 Instance**: Hosts the WhatsApp bot scripts (`view.sh`, `update.sh`).
+1. **Hermes Core**: Main AI agent that receives user requests and uses the ec2-whatsapp skill
+2. **SSH Terminal Tool**: Built-in Hermes tool for executing SSH commands
+3. **Remote EC2 Instance**: Hosts the WhatsApp bot scripts (`view.sh`, `update.sh`)
 
 ## Prerequisites
 
@@ -33,6 +33,7 @@ cp .env.example .env
 
 Required variables:
 ```ini
+OPENROUTER_API_KEY=<your-openrouter-api-key>
 EC2_HOST=<your-ec2-public-ip-or-dns>
 EC2_USER=<ssh-username>  # Typically 'ec2-user' or 'ubuntu'
 EC2_KEY_FILE=ec2-whatsapp.pem
@@ -70,8 +71,6 @@ Expected output should include `view.sh` and `update.sh` with execute permission
 docker compose up -d
 ```
 
-This starts both the Hermes agent and the `ec2-whatsapp-mcp` service.
-
 ### Step 5: Enable Skills
 
 Enable the EC2 tools for your WhatsApp persona:
@@ -108,12 +107,14 @@ The agent will:
 3. Execute the remote `update.sh` script via SSH
 4. Verify the bot started successfully
 
-## Available Tools
+## Available Commands
 
-| Tool | Description | Required Arguments |
+The ec2-whatsapp skill provides these capabilities via SSH:
+
+| Command | Description | Required Arguments |
 |------|-------------|-------------------|
-| `view_whatsapp_bots` | Lists running WhatsApp processes | None (optional: env) |
-| `update_whatsapp_bot` | Deploys and restarts a bot | env, mobile, email |
+| `view.sh [env]` | Lists running WhatsApp processes | None (optional: env) |
+| `update.sh` | Deploys and restarts a bot | -env, -mobile, -email |
 
 ## Troubleshooting
 

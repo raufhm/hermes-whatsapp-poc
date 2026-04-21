@@ -11,9 +11,9 @@ This repository extends the Hermes Agent framework to provide secure, AI-driven 
 ```
 SKILL.md (Capability Spec)
     ↓
-MCP Server Implementation
+SSH Terminal Tool Configuration
     ↓
-Configuration & Environment
+Environment Variables & Keys
     ↓
 Verification & Testing
 ```
@@ -27,7 +27,7 @@ Every capability must be defined by a specification file before implementation:
 **Required Sections:**
 - **Metadata**: name, version, risk level, description, tags
 - **When to Use**: Clear use cases and anti-patterns
-- **Procedure**: Step-by-step operational workflow
+- **Procedure**: Step-by-step operational workflow via SSH
 - **Environment Variables**: Required configuration with prompts
 - **Pitfalls**: Known issues and mitigation strategies
 - **Verification**: Success criteria and validation steps
@@ -53,32 +53,32 @@ description: Clear capability description
 ## Environment Variables
 ```
 
-#### 2. MCP Server Implementations (`mcp-servers/*/`)
+#### 2. SSH-Based Implementation
 
-Each MCP server implements exactly one skill specification:
+Skills are executed via the built-in SSH terminal tool, referencing SKILL.md procedures:
 
 **Required Components:**
-- `server.py` or `index.js`: Main server implementation
-- `tools/`: Individual tool implementations matching spec procedures
-- `README.md`: Implementation notes and testing instructions
+- `skills/<skill-name>/SKILL.md`: Complete operational specification
+- SSH access configured in `.env` and docker-compose.yml
+- Remote scripts on EC2 instance (e.g., `/home/ec2-user/scripts/`)
 
 **Implementation Rules:**
-- Tools must map directly to procedures in SKILL.md
-- Input validation must match spec requirements
-- Error messages must reference spec pitfalls
-- No functionality outside spec scope
+- Hermes agent references SKILL.md for context and procedures
+- SSH tool executes commands directly on remote EC2 instance
+- All operations follow the step-by-step procedures in the spec
+- Error handling and validation based on spec pitfalls
+- No intermediate MCP server layer needed
 
 #### 3. Configuration Files
 
 **Environment-Specific Configs:**
-- `config-dev.yaml`: Development environment
-- `config-stg.yaml`: Staging environment  
-- `config-prd.yaml`: Production environment
+- `docker-compose.yml`: Single service configuration with SSH settings
+- `.env*`: Environment variables for SSH access and WhatsApp bridge
 
 **Configuration Standards:**
-- All sensitive values parameterized via `${VAR_NAME}`
-- MCP servers reference skill names from specs
-- Environment variables documented in SKILL.md
+- All sensitive values parameterized via environment variables
+- SSH credentials isolated in gitignored keys directory
+- Skills reference environment variables documented in SKILL.md
 
 #### 4. Environment Variables (`.env*`)
 
@@ -91,30 +91,30 @@ Each MCP server implements exactly one skill specification:
 
 ### Phase 1: Specification
 
-1. **Identify Capability**: Define what the agent should do
+1. **Identify Capability**: Define what the agent should do via SSH
 2. **Risk Assessment**: Classify as safe/medium/high
-3. **Write SKILL.md**: Complete specification following template
+3. **Write SKILL.md**: Complete specification following template with SSH procedures
 4. **Review**: Validate clarity, completeness, and safety
 
 ### Phase 2: Implementation
 
-1. **Create MCP Server**: Scaffold `mcp-servers/<skill-name>/`
-2. **Implement Tools**: Code each procedure from spec
-3. **Add Configuration**: Update config files with MCP server
-4. **Document Setup**: Create integration guide if needed
+1. **Create Skill Directory**: Scaffold `skills/<skill-name>/SKILL.md`
+2. **Configure SSH Access**: Add environment variables to `.env` and docker-compose.yml
+3. **Deploy Remote Scripts**: Ensure scripts exist on EC2 instance at specified paths
+4. **Document Setup**: Update README with skill usage examples
 
 ### Phase 3: Verification
 
-1. **Unit Testing**: Test each tool independently
-2. **Integration Testing**: Verify end-to-end workflow
-3. **Spec Compliance**: Ensure implementation matches spec
-4. **Security Review**: Validate secrets handling
+1. **Manual Testing**: Execute procedures via SSH terminal tool
+2. **Integration Testing**: Verify end-to-end workflow through Hermes agent
+3. **Spec Compliance**: Ensure SSH commands match spec procedures
+4. **Security Review**: Validate SSH key handling and access controls
 
 ### Phase 4: Deployment
 
-1. **Enable Skill**: `hermes tools enable <persona> <skill>:*`
-2. **Monitor**: Track usage and errors
-3. **Iterate**: Update spec and implementation based on feedback
+1. **Enable Skill**: Agent automatically references SKILL.md when using SSH tool
+2. **Monitor**: Track usage and errors via logs
+3. **Iterate**: Update spec based on operational feedback
 
 ## Risk Classification System
 
@@ -137,14 +137,10 @@ Each MCP server implements exactly one skill specification:
 │   └── <skill-name>/
 │       ├── SKILL.md         # Canonical specification
 │       └── references/      # Supporting documentation
-├── mcp-servers/             # MCP implementations
-│   └── <skill-name>/
-│       ├── server.py        # Server implementation
-│       └── tools/           # Tool implementations
-├── config-*.yaml            # Environment configs
+├── docker-compose.yml       # Service configuration
 ├── .env.example             # Environment template
 ├── keys/                    # SSH keys (gitignored)
-└── scripts/                 # Utility scripts
+└── scripts/                 # Local utility scripts
 ```
 
 ### Documentation Standards
@@ -162,16 +158,17 @@ Each MCP server implements exactly one skill specification:
 
 **SKILL.md**:
 - Authoritative specification
-- Implementation-agnostic
-- User-facing procedures
+- SSH command procedures
+- User-facing operational workflows
+- Environment variable requirements
 
 ### Security Requirements
 
 1. **No Hardcoded Secrets**: All credentials via environment variables
-2. **Key Isolation**: SSH keys in gitignored directories, read-only mounts
-3. **Least Privilege**: MCP servers execute only specified scripts
-4. **Audit Trail**: Log all remote operations
-5. **Environment Separation**: Isolated configs per environment
+2. **Key Isolation**: SSH keys in gitignored directories, read-only mounts in container
+3. **Least Privilege**: SSH user has minimal permissions on EC2 instance
+4. **Audit Trail**: Log all SSH operations and commands executed
+5. **Environment Separation**: Isolated configs per environment via .env files
 
 ## Governance
 
@@ -186,7 +183,7 @@ Each MCP server implements exactly one skill specification:
 
 **Specification Changes**:
 1. Update SKILL.md with new version
-2. Document breaking changes
+2. Document breaking changes in SSH procedures
 3. Implement migration path if needed
 4. Deprecate old version after transition period
 
@@ -194,21 +191,30 @@ Each MCP server implements exactly one skill specification:
 1. Must remain within spec scope
 2. Breaking changes require spec update first
 3. Backward compatibility preferred
+4. SSH command updates tested in dev environment
 
 **Configuration Changes**:
 1. Test in dev environment first
 2. Document in changelog
 3. Update .env.example if adding variables
+4. Verify SSH connectivity after changes
 
 ## Quality Metrics
 
-1. **Spec Coverage**: 100% of capabilities have SKILL.md
-2. **Implementation Fidelity**: Tools match spec procedures exactly
-3. **Security Compliance**: Zero hardcoded secrets, all keys isolated
+1. **Spec Coverage**: 100% of capabilities have SKILL.md with SSH procedures
+2. **Implementation Fidelity**: SSH commands match spec procedures exactly
+3. **Security Compliance**: Zero hardcoded secrets, all SSH keys isolated
 4. **Documentation Completeness**: Users can setup in <15 minutes
-5. **Operational Reliability**: >99% successful operation rate
+5. **Operational Reliability**: >99% successful SSH operation rate
+6. **Skill Effectiveness**: Agent correctly references SKILL.md for all operations
 
 ## Revision History
+
+- **v2.0.0**: Simplified architecture - SSH-based implementation
+  - Removed MCP server layer
+  - Direct SSH terminal tool integration
+  - Streamlined skill specification workflow
+  - Updated security requirements for SSH access
 
 - **v1.0.0**: Initial constitution
   - Spec-driven development framework
