@@ -1,0 +1,61 @@
+# Hermes Agent Configuration
+# See: https://hermes-agent.nousresearch.com/docs/user-guide/configuration
+
+# LLM Provider Configuration (OpenRouter)
+llm:
+  provider: openrouter
+  model: nousresearch/hermes-3-llama-3.1-70b
+  
+# WhatsApp-specific configuration
+whatsapp:
+  # Behavior for unauthorized DMs: 'pair', 'ignore', or 'reply'
+  unauthorized_dm_behavior: ignore
+  
+  # Optional: Custom reply prefix (empty string disables it)
+  # reply_prefix: ""
+  
+  # Optional: Custom prefix with formatting
+  # reply_prefix: "⚕ *Hermes Agent*\n──────\n"
+
+# Global security settings
+security:
+  # Default behavior for unauthorized DMs across all platforms
+  unauthorized_dm_behavior: pair
+
+# Voice/STT configuration (optional)
+# voice:
+#   stt_provider: faster-whisper  # or 'groq', 'openai'
+#   tts_provider: local            # or 'openai', 'elevenlabs'
+
+# Logging configuration
+logging:
+  level: info  # debug, info, warn, error
+
+# MCP Servers (Model Context Protocol)
+# Uncomment and configure these to add new tools to Hermes.
+# Once added, enable them for WhatsApp with: 
+#   docker compose run --rm hermes tools enable whatsapp <name>:*
+#
+# mcp_servers:
+#   # Example 1: HTTP/SSE server (e.g., a shared toolset)
+#   # maps:
+#   #   url: https://mcp-server.example.com/sse
+#   #   enabled: true
+#
+#   # Example 2: Local stdio server (e.g., the official SQLite server)
+#   # sqlite:
+#   #   command: npx
+#   #   args: 
+#   #     - "-y"
+#   #     - "@modelcontextprotocol/server-sqlite"
+#   #     - "--db"
+#   #     - "/opt/data/state.db"
+#   #   enabled: true
+#
+#   # Example 3: Server requiring an API key (from .env)
+#   # github:
+#   #   command: npx
+#   #   args: ["-y", "@modelcontextprotocol/server-github"]
+#   #   env:
+#   #     GITHUB_PERSONAL_ACCESS_TOKEN: "${MCP_GITHUB_API_KEY}"
+#   #   enabled: true

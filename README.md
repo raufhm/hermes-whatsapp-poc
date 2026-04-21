@@ -1,150 +1,73 @@
-# Hermes Agent Docker Setup with WhatsApp Integration
+# Hermes WhatsApp Agent
 
-This Docker setup allows you to run Hermes Agent with WhatsApp integration using OpenRouter as the LLM provider.
+A lightweight, Docker-native setup for running the [Hermes Agent](https://hermes-agent.nousresearch.com/) with WhatsApp integration using OpenRouter LLMs.
 
-## Prerequisites
+## 🚀 Quick Start
 
-1. Docker and Docker Compose installed
-2. An OpenRouter API key (get one at https://openrouter.ai)
-3. A phone number for WhatsApp (can use Google Voice, prepaid SIM, or VoIP service)
-4. Node.js v18+ on your host machine (required for WhatsApp QR code pairing)
-
-## Quick Start
-
-### 1. Configure Environment Variables
-
-Copy the example environment file and edit it:
-
+### 1. Initial Setup
+Initialize your environment file (defaults to `dev`):
 ```bash
-cp .env.example .env
+make setup ENV=dev
 ```
+Edit the newly created `.env.dev` file and add your `OPENROUTER_API_KEY`.
 
-Edit `.env` and set:
-- `OPENROUTER_API_KEY=your_api_key_here`
-- `WHATSAPP_ENABLED=true`
-- `WHATSAPP_MODE=bot` (or `self-chat`)
-- `WHATSAPP_ALLOWED_USERS=*` (or specific phone numbers)
-
-### 2. Build and Start the Container
-
+### 2. Pair WhatsApp
+Run the pairing script for your environment:
 ```bash
-docker compose up -d --build
+make pair ENV=dev
 ```
+*Note: Press [Enter] once when prompted to "Update allowed users".*
 
-### 3. Pair WhatsApp (First Time Setup)
-
-Run the WhatsApp pairing command:
-
+### 3. Start Service
+Launch the agent in the background:
 ```bash
-./scripts/pair-whatsapp.sh
+make start ENV=dev
 ```
 
-This will display a QR code in your terminal. Scan it with WhatsApp:
-1. Open WhatsApp on your phone
-2. Go to Settings → Linked Devices
-3. Tap "Link a Device"
-4. Point your camera at the terminal QR code
+## 🌍 Environment Support
 
-### 4. Verify the Service
+You can manage multiple isolated environments (e.g., `dev`, `stg`, `prd`) by appending `ENV=<name>` to any `make` command.
 
-Check the logs:
+- **Isolated Config**: Uses `config-<name>.yaml`
+- **Isolated Secrets**: Uses `.env.<name>`
+- **Isolated Data**: Stores sessions in `data/hermes-<name>/`
 
-```bash
-docker compose logs -f hermes
-```
+**Examples:**
+- `make start ENV=prd`: Start the production agent.
+- `make logs ENV=stg`: View logs for the staging agent.
+- `make status ENV=dev`: Check status of the development agent.
 
-## Usage
+## 🛠️ Management Commands
 
-Once paired, the gateway will automatically start and handle WhatsApp messages.
+Use the provided `Makefile` for easy management:
 
-### Sending Messages
+| Command | Description |
+| :--- | :--- |
+| `make status` | Check if the agent is running and paired |
+| `make logs` | View real-time agent activity and chat logs |
+| `make stop` | Stop the background service |
+| `make restart`| Restart the service after config changes |
+| `make clean` | **Reset everything**: Deletes ALL environment data and stops containers |
 
-Simply send a message to your configured WhatsApp number, and Hermes will respond.
+## ⚙️ Configuration
 
-### Stopping the Service
-
-```bash
-docker compose down
-```
-
-### Restarting the Service
-
-```bash
-docker compose restart
-```
-
-## File Structure
-
-```
-.
-├── docker-compose.yml          # Docker Compose configuration
-├── .env.example                # Example environment variables
-├── config.yaml                 # Hermes configuration
-├── scripts/
-│   ├── pair-whatsapp.sh        # WhatsApp pairing script
-│   └── check-status.sh         # Status check script
-└── data/                       # Persistent data directory (created automatically)
-    └── hermes/                 # Hermes session and config data
-```
-
-## Configuration
-
-### Environment Variables (.env)
-
+### Environment (`.env`)
 | Variable | Description | Default |
-|----------|-------------|---------|
-| `OPENROUTER_API_KEY` | Your OpenRouter API key | Required |
-| `WHATSAPP_ENABLED` | Enable WhatsApp integration | `true` |
-| `WHATSAPP_MODE` | `bot` or `self-chat` | `bot` |
-| `WHATSAPP_ALLOWED_USERS` | Allowed phone numbers (comma-separated) or `*` for all | `*` |
-| `HERMES_MODEL` | Model to use via OpenRouter | `nousresearch/hermes-3-llama-3.1-70b` |
+| :--- | :--- | :--- |
+| `OPENROUTER_API_KEY` | Your OpenRouter API key | **Required** |
+| `WHATSAPP_MODE` | `bot` (separate number) or `self-chat` | `bot` |
+| `HERMES_MODEL` | The LLM to use via OpenRouter | `hermes-3-llama-3.1-70b` |
 
-### Hermes Configuration (config.yaml)
+### Customizing Behavior (`config.yaml`)
+Edit `config.yaml` to change the agent's personality, reasoning levels, or to add **MCP Tools**. Examples for adding Google Maps, GitHub, or SQLite tools are included as comments at the bottom of the file.
 
-You can customize agent behavior in `config.yaml`. See the [Hermes documentation](https://hermes-agent.nousresearch.com/docs/) for details.
+## 📂 Project Structure
+- `config.yaml`: Core agent behavior and MCP tool settings.
+- `Makefile`: Standard interface for all operations.
+- `scripts/`: Internal automation for Docker operations.
+- `data/`: (**Ignored by Git**) Stores your encrypted WhatsApp session and logs.
 
-## Troubleshooting
-
-### QR Code Not Showing
-
-Make sure your terminal supports Unicode and is at least 60 columns wide.
-
-### Session Lost
-
-If the session is lost, re-run the pairing script:
-
-```bash
-./scripts/pair-whatsapp.sh
-```
-
-### Check Logs
-
-```bash
-docker compose logs -f hermes
-```
-
-### View Gateway Status
-
-```bash
-./scripts/check-status.sh
-```
-
-## Security Notes
-
-- Keep your `.env` file secure and never commit it to version control
-- The WhatsApp session credentials are stored in `data/hermes/platforms/whatsapp/session`
-- Use a dedicated phone number for the bot to isolate risk
-- Set appropriate access controls with `WHATSAPP_ALLOWED_USERS`
-
-## Updating
-
-To update to the latest Hermes version:
-
-```bash
-docker compose pull
-docker compose up -d
-```
-
-## License
-
-MIT License - See LICENSE file for details
+## 🛡️ Security
+- Your `.env` and `data/` folder contain sensitive session keys; they are automatically ignored by git.
+- WhatsApp sessions are stored locally in the `data/` volume.
+- Use `WHATSAPP_ALLOWED_USERS` in `.env` to restrict who can talk to your bot.

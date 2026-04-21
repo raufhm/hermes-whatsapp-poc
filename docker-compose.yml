@@ -1,8 +1,9 @@
 services:
   hermes:
-    image: ghcr.io/nousresearch/hermes-agent:latest
-    container_name: hermes-agent
+    image: nousresearch/hermes-agent:latest
+    container_name: hermes-${ENV:-dev}
     restart: unless-stopped
+    command: gateway run
     environment:
       # OpenRouter API Configuration
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
@@ -19,13 +20,14 @@ services:
       
       # Debug mode
       - HERMES_DEBUG=${HERMES_DEBUG:-false}
+      - PATH=/opt/hermes/.venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
     
     volumes:
       # Persist Hermes configuration and session data
-      - ./data/hermes:/root/.hermes
+      - ./data/hermes-${ENV:-dev}:/opt/data
       
       # Optional: Mount custom config file
-      - ./config.yaml:/root/.hermes/config.yaml:ro
+      - ./${HERMES_CONFIG_FILE:-config.yaml}:/opt/data/config.yaml:ro
     
     networks:
       - hermes-network

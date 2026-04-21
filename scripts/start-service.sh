@@ -5,29 +5,23 @@
 
 set -e
 
+# Default environment to dev if not set
+ENV="${ENV:-dev}"
+ENV_FILE=".env.${ENV}"
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 
 echo "========================================="
-echo "Hermes Agent - Starting Service"
+echo "Hermes Agent - Starting Service ($ENV)"
 echo "========================================="
 echo ""
 
 # Check if .env file exists
-if [ ! -f "$PROJECT_DIR/.env" ]; then
-    echo "❌ Error: .env file not found!"
+if [ ! -f "$PROJECT_DIR/$ENV_FILE" ]; then
+    echo "❌ Error: $ENV_FILE not found!"
     echo ""
-    echo "Please copy .env.example to .env and configure it:"
-    echo "  cp $PROJECT_DIR/.env.example $PROJECT_DIR/.env"
-    echo ""
-    exit 1
-fi
-
-# Check if OPENROUTER_API_KEY is set
-if ! grep -q "^OPENROUTER_API_KEY=" "$PROJECT_DIR/.env"; then
-    echo "❌ Error: OPENROUTER_API_KEY not set in .env file!"
-    echo ""
-    echo "Please edit $PROJECT_DIR/.env and set your OpenRouter API key."
+    echo "Please run: make setup ENV=$ENV"
     echo ""
     exit 1
 fi
@@ -38,11 +32,11 @@ if ! docker info &> /dev/null; then
     exit 1
 fi
 
-echo "Building and starting Hermes Agent..."
+echo "Starting Hermes Agent ($ENV)..."
 echo ""
 
 # Build and start the container
-docker compose -f "$PROJECT_DIR/docker-compose.yml" up -d --build
+docker compose -p "hermes-$ENV" --env-file "$PROJECT_DIR/$ENV_FILE" -f "$PROJECT_DIR/docker-compose.yml" up -d
 
 echo ""
 echo "========================================="
@@ -50,11 +44,8 @@ echo "✅ Service started successfully!"
 echo "========================================="
 echo ""
 echo "To view logs, run:"
-echo "  docker compose logs -f hermes"
+echo "  make logs ENV=$ENV"
 echo ""
 echo "To check status, run:"
-echo "  $SCRIPT_DIR/check-status.sh"
-echo ""
-echo "If this is your first time, you need to pair WhatsApp:"
-echo "  $SCRIPT_DIR/pair-whatsapp.sh"
+echo "  make status ENV=$ENV"
 echo ""
