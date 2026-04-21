@@ -63,30 +63,6 @@ services:
         max-size: "10m"
         max-file: "3"
 
-    depends_on:
-      - ec2-whatsapp-mcp
-
-  ec2-whatsapp-mcp:
-    build:
-      context: ./mcp-servers/ec2-whatsapp
-      dockerfile: Dockerfile
-    container_name: ec2-whatsapp-mcp-${ENV:-dev}
-    restart: unless-stopped
-    environment:
-      - EC2_HOST=${EC2_HOST}
-      - EC2_USER=${EC2_USER}
-      - EC2_KEY_FILE=/opt/keys/${EC2_KEY_FILE:-ec2-whatsapp.pem}
-    volumes:
-      # Mount EC2 PEM key file (read-only)
-      - ${EC2_KEY_PATH:-./keys/ec2-whatsapp.pem}:/opt/keys/${EC2_KEY_FILE:-ec2-whatsapp.pem}:ro
-    networks:
-      - hermes-network
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-
 networks:
   hermes-network:
     driver: bridge
