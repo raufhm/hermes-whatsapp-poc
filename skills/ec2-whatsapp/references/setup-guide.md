@@ -1,6 +1,6 @@
 # EC2 WhatsApp Skill Setup Guide
 
-This guide walks you through setting up the `ec2-whatsapp` skill in Hermes.
+This guide walks you through setting up the `ec2-whatsapp` skill in Hermes via SSH.
 
 ## Prerequisites
 
@@ -34,17 +34,21 @@ cp .env.example .env
 Edit `.env` and fill in your values:
 
 ```env
+# OpenRouter API Configuration
+OPENROUTER_API_KEY=<your-api-key>
+
 # EC2 Configuration for WhatsApp Bots
 EC2_HOST=your-ec2-public-ip-or-dns
 EC2_USER=ec2-user
-EC2_KEY_FILE=/workspace/keys/ec2-whatsapp.pem
+EC2_KEY_FILE=ec2-whatsapp.pem
 ```
 
 | Variable | Description | Example |
 |----------|-------------|---------|
+| `OPENROUTER_API_KEY` | Your OpenRouter API key | `sk-or-...` |
 | `EC2_HOST` | EC2 public IP or DNS name | `54.123.45.67` or `ec2-54-123-45-67.ap-southeast-1.compute.amazonaws.com` |
 | `EC2_USER` | SSH username | `ec2-user` (Amazon Linux) or `ubuntu` (Ubuntu) |
-| `EC2_KEY_FILE` | Absolute path to PEM file inside container | `/workspace/keys/ec2-whatsapp.pem` |
+| `EC2_KEY_FILE` | PEM filename in keys/ directory | `ec2-whatsapp.pem` |
 
 ## Step 3: Start Docker Services
 
@@ -99,7 +103,7 @@ Update the WhatsApp bot for mobile 6587654321 with email bot@example.com in stag
 
 The skill will:
 1. Ask you to confirm the parameters (env, mobile, email)
-2. Execute `update.sh` on EC2
+2. Execute `update.sh` on EC2 via SSH
 3. Verify the bot started successfully
 
 ## Usage Examples
