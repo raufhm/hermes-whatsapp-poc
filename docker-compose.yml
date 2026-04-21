@@ -1,0 +1,50 @@
+services:
+  hermes:
+    image: ghcr.io/nousresearch/hermes-agent:latest
+    container_name: hermes-agent
+    restart: unless-stopped
+    environment:
+      # OpenRouter API Configuration
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      
+      # WhatsApp Configuration
+      - WHATSAPP_ENABLED=${WHATSAPP_ENABLED:-true}
+      - WHATSAPP_MODE=${WHATSAPP_MODE:-bot}
+      - WHATSAPP_ALLOWED_USERS=${WHATSAPP_ALLOWED_USERS:-*}
+      - WHATSAPP_ALLOW_ALL_USERS=${WHATSAPP_ALLOW_ALL_USERS:-}
+      - WHATSAPP_DEBUG=${WHATSAPP_DEBUG:-false}
+      
+      # Model Configuration
+      - HERMES_MODEL=${HERMES_MODEL:-nousresearch/hermes-3-llama-3.1-70b}
+      
+      # Debug mode
+      - HERMES_DEBUG=${HERMES_DEBUG:-false}
+    
+    volumes:
+      # Persist Hermes configuration and session data
+      - ./data/hermes:/root/.hermes
+      
+      # Optional: Mount custom config file
+      - ./config.yaml:/root/.hermes/config.yaml:ro
+    
+    networks:
+      - hermes-network
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "hermes", "--version"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    
+    # Logging configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  hermes-network:
+    driver: bridge

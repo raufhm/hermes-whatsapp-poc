@@ -1,0 +1,32 @@
+# Hermes Agent Configuration
+# See: https://hermes-agent.nousresearch.com/docs/user-guide/configuration
+
+# LLM Provider Configuration (OpenRouter)
+llm:
+  provider: openrouter
+  model: nousresearch/hermes-3-llama-3.1-70b
+  
+# WhatsApp-specific configuration
+whatsapp:
+  # Behavior for unauthorized DMs: 'pair', 'ignore', or 'reply'
+  unauthorized_dm_behavior: ignore
+  
+  # Optional: Custom reply prefix (empty string disables it)
+  # reply_prefix: ""
+  
+  # Optional: Custom prefix with formatting
+  # reply_prefix: "⚕ *Hermes Agent*\n──────\n"
+
+# Global security settings
+security:
+  # Default behavior for unauthorized DMs across all platforms
+  unauthorized_dm_behavior: pair
+
+# Voice/STT configuration (optional)
+# voice:
+#   stt_provider: faster-whisper  # or 'groq', 'openai'
+#   tts_provider: local            # or 'openai', 'elevenlabs'
+
+# Logging configuration
+logging:
+  level: info  # debug, info, warn, error
