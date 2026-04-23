@@ -1,101 +1,56 @@
 # Hermes WhatsApp Agent
 
-A lightweight, Docker-native setup for running the [Hermes Agent](https://hermes-agent.nousresearch.com/) with WhatsApp integration using OpenRouter LLMs and EC2 bot management via SSH.
+A Docker-native setup for the [Hermes Agent](https://hermes-agent.nousresearch.com/) with WhatsApp integration and remote EC2 bot management.
 
-## Quick Start
+## 🚀 Quick Start (5 Minutes)
 
-### 1. Initial Setup
-Create your environment file:
+### 1. Configure Environment
+Initialize your environment file (default is `dev`):
 ```bash
-cp .env.example .env
+make setup
+# Edit .env.dev and add your OPENROUTER_API_KEY and EC2 details
 ```
-Edit `.env` and add your `OPENROUTER_API_KEY` and EC2 configuration (see Configuration section).
 
-### 2. Place EC2 SSH Key
-Copy your EC2 PEM key to the keys directory:
+### 2. Prepare SSH Keys
+Place your EC2 PEM key in the `keys/` directory:
 ```bash
 mkdir -p keys
-cp /path/to/your/key.pem keys/ec2-whatsapp.pem
+# cp /path/to/key.pem keys/ec2-whatsapp.pem
 chmod 600 keys/ec2-whatsapp.pem
 ```
 
-### 3. Pair WhatsApp
-Start the service and follow pairing instructions:
+### 3. Launch & Pair
 ```bash
-docker compose up -d
-docker compose logs -f hermes
+make up
+make logs
 ```
-*Note: Press [Enter] once when prompted to "Update allowed users".*
+*Scan the QR code in the logs with your WhatsApp app.*
 
-### 4. SSH-EC2 Tool Ready
+## 🛠 Management Commands
 
-The `ssh-ec2` tool is built into Hermes and ready to use for managing WhatsApp bots on EC2. No additional skill enablement required.
-
-Test connectivity:
-```bash
-docker compose run --rm hermes ssh-ec2 "cd /home/ec2-user/scripts && ./view.sh"
-```
-
-## Environment Support
-
-You can manage multiple isolated environments (e.g., `dev`, `stg`, `prd`) using different config files:
-
-- **Isolated Config**: Uses `config-<name>.yaml`
-- **Isolated Secrets**: Uses `.env.<name>`
-- **Isolated Data**: Stores sessions in `data/hermes-<name>/`
-
-Set `ENV` variable in docker-compose command:
-```bash
-ENV=prd docker compose up -d
-```
-
-## Management Commands
+The project uses a **parameterized Makefile**. Default environment is `dev`.
 
 | Command | Description |
 | :--- | :--- |
-| `docker compose up -d` | Start the agent in background |
-| `docker compose logs -f` | View real-time agent activity |
-| `docker compose down` | Stop the service |
-| `docker compose restart` | Restart after config changes |
-| `docker compose ps` | Check if agent is running |
+| `make up` | Start dev agent |
+| `ENV=prd make up` | Start production agent |
+| `make restart` | Restart the agent |
+| `make logs` | View real-time activity |
+| `make pair` | View WhatsApp pairing QR code |
+| `make ps` | Check service status |
+| `make setup ENV=stg` | Prepare staging env file |
 
-## Configuration
+## 📂 Project Structure
 
-### Environment (`.env`)
-| Variable | Description | Default |
-| :--- | :--- | :--- |
-| `OPENROUTER_API_KEY` | Your OpenRouter API key | **Required** |
-| `WHATSAPP_MODE` | `bot` (separate number) or `self-chat` | `bot` |
-| `HERMES_MODEL` | The LLM to use via OpenRouter | `hermes-3-llama-3.1-70b` |
-| `EC2_HOST` | EC2 instance IP/DNS for WhatsApp bots | **Required for EC2 features** |
-| `EC2_USER` | SSH username for EC2 | `ec2-user` |
-| `EC2_KEY_FILE` | Path to EC2 PEM key | `ec2-whatsapp.pem` |
+- `artifacts/config/`: Environment-specific agent settings.
+- `artifacts/skills/`: Operational capabilities (Bind-mounted).
+- `artifacts/soul/`: Agent's durable personality (Bind-mounted).
+- `CONSTITUTION.md`: Project standards and Spec-Driven principles.
 
-### Customizing Behavior (`config.yaml`)
-Edit `config.yaml` to change the agent's personality, reasoning levels, or to add **MCP Tools**. Examples for adding Google Maps, GitHub, or SQLite tools are included as comments at the bottom of the file.
+## 📖 Documentation
 
-## EC2 WhatsApp Integration
+- **[CONSTITUTION.md](CONSTITUTION.md)**: Development and automation standards.
+- **[artifacts/skills/ec2-whatsapp/SKILL.md](artifacts/skills/ec2-whatsapp/SKILL.md)**: Guide for remote bot management.
 
-This project includes integration to manage WhatsApp bots on remote EC2 instances via SSH using the built-in `ssh-ec2` tool. The agent executes remote scripts securely through SSH terminal commands. See the [EC2 Integration Guide](README-EC2.md) for setup instructions.
-
-## Project Structure
-
-- `CONSTITUTION.md`: Project governance and development standards
-- `skills/`: Skill specifications defining agent capabilities
-- `config-*.yaml`: Environment-specific configurations
-- `scripts/`: Helper scripts for common operations
-- `data/`: (**Ignored by Git**) Stores your encrypted WhatsApp session and logs
-- `keys/`: (**Ignored by Git**) SSH keys for EC2 access
-
-## Security
-
-- Your `.env` and `data/` folder contain sensitive session keys; they are automatically ignored by git.
-- WhatsApp sessions are stored locally in the `data/` volume.
-- Use `WHATSAPP_ALLOWED_USERS` in `.env` to restrict who can talk to your bot.
-- SSH keys for EC2 integration are stored in `keys/` (gitignored) and mounted read-only to containers.
-
-## Documentation
-
-- **[CONSTITUTION.md](CONSTITUTION.md)**: Development standards and project governance
-- **[README-EC2.md](README-EC2.md)**: EC2 WhatsApp integration guide via SSH using ssh-ec2 tool
-- **[skills/ec2-whatsapp/SKILL.md](skills/ec2-whatsapp/SKILL.md)**: EC2 WhatsApp capability specification (reference only, use ssh-ec2 directly)
+---
+*Built with Hermes Agent Framework*

@@ -12,6 +12,7 @@ node_modules/
 
 # Editors
 .vscode/
+.idea/
 
 # Python
 __pycache__/
@@ -48,3 +49,5 @@ Looking again: Modified files include `.gitignore`, `config-dev.yaml`, `config-p
 ```
 
 ```
+# Persistent Data
+data/

@@ -39,11 +39,17 @@ services:
       # Persist Hermes configuration and session data
       - ./data/hermes-${ENV:-dev}:/opt/data
       
-      # Optional: Mount custom config file
-      - ./${HERMES_CONFIG_FILE:-config.yaml}:/opt/data/config.yaml:ro
+      # Automate skill syncing (mounted separately to avoid shadowing)
+      - ./artifacts/skills:/opt/artifacts/skills:ro
       
-      # Mount EC2 PEM key file (read-only)
-      - ${EC2_KEY_PATH:-./keys/ec2-whatsapp.pem}:/opt/keys/${EC2_KEY_FILE:-ec2-whatsapp.pem}:ro
+      # Automate personality syncing
+      - ./artifacts/soul/SOUL.md:/opt/data/SOUL.md:ro
+      
+      # Environment-aware config file mounting from artifacts
+      - ./artifacts/config/${HERMES_CONFIG_FILE:-config-${ENV:-dev}.yaml}:/opt/data/config.yaml:ro
+      
+      # Mount EC2 PEM key file (if provided via EC2_KEY_PATH in .env)
+      - ${EC2_KEY_PATH:-/dev/null}:/opt/keys/${EC2_KEY_FILE:-ec2-whatsapp.pem}:ro
     
     networks:
       - hermes-network

@@ -36,7 +36,8 @@ logging:
 skills:
   # External skill directories to scan (in addition to ~/.hermes/skills/)
   external_dirs:
-    - /workspace/skills
+    - /opt/data/skills
+    - /opt/artifacts/skills
 
 # MCP Servers (Model Context Protocol)
 # Once added, enable them for WhatsApp with: 
